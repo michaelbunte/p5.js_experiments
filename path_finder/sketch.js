@@ -7,8 +7,8 @@ let mazeStack;
 let changedBoxes;
 
 function setup() {
-  boxCount = createVector(100, 100);
-  boxSize = 5;
+  boxCount = createVector(200, 200);
+  boxSize = 2;
   boxes = [];
   changedBoxes = [];
   for (let i = 0; i < boxCount.y; i++) {
@@ -17,12 +17,12 @@ function setup() {
       let newBox = new Box(j, i, boxSize);
       boxes[i].push(newBox);
 
-      if(random(0, 100) > 60) {
+      if(random(0, 100) > 63) {
         boxes[i][j].makeWall();
       }
     }
   }
-  startSquare = boxes[1][1];
+  startSquare = boxes[50][50];
   startSquare.makeStart();
   
   endSquare = boxes[boxCount.y - 2][boxCount.x - 2];
@@ -163,6 +163,26 @@ function shuffleArray(array) {
   }
 }
 
+function sortByDistance(adj_boxes, target) {
+  // let sorted = true;
+  // do {
+  //   run++;
+  //   console.log(run)
+  //   for(let i = 0; i < adj_boxes.length - 1; i++) {
+  //     let boxAdist = dist(adj_boxes[i].index.x, adj_boxes[i].index.y, target.index.x, target.index.y);
+  //     let boxBdist = dist(adj_boxes[i + 1].index.x, adj_boxes[i + 1].index.y, target.index.x, target.index.y);
+  //     if(boxBdist < boxAdist) {
+  //       let temp = adj_boxes[i];
+  //       adj_boxes[i] = adj_boxes[i + 1];
+  //       adj_boxes[i + 1] = temp;
+  //       sorted = false;
+  //     }
+  //   }
+  // } while ( ! sorted)
+  //adj_boxes.sort(compareDistance());
+  adj_boxes.sort(function(a, b){return  dist(b.index.x, b.index.y, endSquare.index.x, endSquare.index.y) - dist(a.index.x, a.index.y, endSquare.index.x, endSquare.index.y)});
+}
+
 function getAdjacentBoxes(box) {
   let adjacentBoxes = [];
   let xpos = box.index.x;
@@ -179,7 +199,8 @@ function getAdjacentBoxes(box) {
   if(xpos > 0) {
     adjacentBoxes.push(boxes[ypos][xpos - 1]);
   }  
-  shuffleArray(adjacentBoxes);
+  // shuffleArray(adjacentBoxes);
+  sortByDistance(adjacentBoxes, endSquare);
   return adjacentBoxes;
 }
 
@@ -199,17 +220,16 @@ function dfs() {
         mazeStack.push(adjacentBoxes[i]);
       } else if (adjacentBoxes[i].isEnd()) {
         // superSelectPath();
+        mazeStack = [];
       }
     }
   }
 }
 
 function draw() {
-  //background(250);
-  for(let i = 0; i < 2; i++) {
+  for(let i = 0; i < 5; i++) {
     dfs();
   }
-  // drawBoxes();
   drawChangedBoxes();
   changedBoxes = [];
 }
