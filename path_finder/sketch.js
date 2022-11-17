@@ -5,9 +5,14 @@ let startSquare;
 let endSquare;
 let mazeStack;
 let changedBoxes;
+let lastKeypressed;
 
 function setup() {
-  boxCount = createVector(200, 200);
+  resetMaze();
+}
+
+function resetMaze() {
+  boxCount = createVector(400, 300);
   boxSize = 2;
   boxes = [];
   changedBoxes = [];
@@ -17,15 +22,21 @@ function setup() {
       let newBox = new Box(j, i, boxSize);
       boxes[i].push(newBox);
 
-      if(random(0, 100) > 63) {
+      if(random(0, 100) > 60) {
         boxes[i][j].makeWall();
       }
     }
   }
-  startSquare = boxes[50][50];
+
+  let startPos = getRandPosition();
+  console.log(boxes[startPos.x]);
+  startSquare = boxes[startPos.y][startPos.x];
   startSquare.makeStart();
   
-  endSquare = boxes[boxCount.y - 2][boxCount.x - 2];
+  let endPos;
+  endPos = getRandPosition();
+
+  endSquare = boxes[endPos.y][endPos.x];
   endSquare.makeEnd();
 
   mazeStack = [];
@@ -139,6 +150,12 @@ class Box {
   }
 }
 
+function getRandPosition() {
+  let vec = createVector(floor(random(boxCount.x )), floor(random(boxCount.y)));
+  console.log(`${vec.x} ${vec.y}`);
+  return vec;
+}
+
 function drawBoxes() {
   for (let i = 0; i < boxCount.y; i++) {
     for(let j = 0; j < boxCount.x; j++) {
@@ -163,23 +180,7 @@ function shuffleArray(array) {
   }
 }
 
-function sortByDistance(adj_boxes, target) {
-  // let sorted = true;
-  // do {
-  //   run++;
-  //   console.log(run)
-  //   for(let i = 0; i < adj_boxes.length - 1; i++) {
-  //     let boxAdist = dist(adj_boxes[i].index.x, adj_boxes[i].index.y, target.index.x, target.index.y);
-  //     let boxBdist = dist(adj_boxes[i + 1].index.x, adj_boxes[i + 1].index.y, target.index.x, target.index.y);
-  //     if(boxBdist < boxAdist) {
-  //       let temp = adj_boxes[i];
-  //       adj_boxes[i] = adj_boxes[i + 1];
-  //       adj_boxes[i + 1] = temp;
-  //       sorted = false;
-  //     }
-  //   }
-  // } while ( ! sorted)
-  //adj_boxes.sort(compareDistance());
+function sortByDistance(adj_boxes) {
   adj_boxes.sort(function(a, b){return  dist(b.index.x, b.index.y, endSquare.index.x, endSquare.index.y) - dist(a.index.x, a.index.y, endSquare.index.x, endSquare.index.y)});
 }
 
@@ -212,6 +213,7 @@ function superSelectPath() {
 
 function dfs() {
   if(mazeStack.length > 0) {
+    sortByDistance(mazeStack);
     let top = mazeStack.pop();
     let adjacentBoxes = getAdjacentBoxes(top);
     for(let i = 0; i < adjacentBoxes.length; i++) {
@@ -219,7 +221,6 @@ function dfs() {
         adjacentBoxes[i].makeSelected();
         mazeStack.push(adjacentBoxes[i]);
       } else if (adjacentBoxes[i].isEnd()) {
-        // superSelectPath();
         mazeStack = [];
       }
     }
@@ -232,4 +233,12 @@ function draw() {
   }
   drawChangedBoxes();
   changedBoxes = [];
+  if(keyIsDown(32) && lastKeypressed !== 32) {
+    resetMaze();
+    lastKeypressed == 32;
+  } else if (keyIsDown(32)) {
+    lastKeypressed == 32;
+  } else {
+    lastKeypressed == null;
+  }
 }
