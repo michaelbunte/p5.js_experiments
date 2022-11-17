@@ -4,32 +4,35 @@ let boxes;
 let startSquare;
 let endSquare;
 let mazeStack;
+let changedBoxes;
 
 function setup() {
-  boxCount = createVector(50, 50);
-  boxSize = 10;
+  boxCount = createVector(100, 100);
+  boxSize = 5;
   boxes = [];
+  changedBoxes = [];
   for (let i = 0; i < boxCount.y; i++) {
     boxes.push([]);
     for(let j = 0; j < boxCount.x; j++) {
       let newBox = new Box(j, i, boxSize);
       boxes[i].push(newBox);
 
-      if(random(0, 100) > 65) {
+      if(random(0, 100) > 60) {
         boxes[i][j].makeWall();
       }
     }
   }
-  startSquare = boxes[0][0];
+  startSquare = boxes[1][1];
   startSquare.makeStart();
   
-  endSquare = boxes[boxCount.y - 1][boxCount.x - 1];
+  endSquare = boxes[boxCount.y - 2][boxCount.x - 2];
   endSquare.makeEnd();
 
   mazeStack = [];
   mazeStack.push(startSquare);
 
   createCanvas(boxCount.x * boxSize, boxCount.y * boxSize);
+  drawBoxes();
 }
 
 class Box {
@@ -39,31 +42,6 @@ class Box {
     this.size = size;
     this.state = "empty";
   }
-
-  makeWall() {
-    this.state = "wall";
-  }
-
-  makeEmpty() {
-    this.state = "empty";
-  }
-
-  makeSelected() {
-    this.state = "selected";
-  }
-
-  makeEnd() {
-    this.state = "end";
-  }
-
-  makeStart() {
-    this.state = "start";
-  }
-
-  makeSuperSelected() {
-    this.state = "superselected";
-  }
-
 
   isWall() {
     return this.state == "wall";
@@ -89,6 +67,50 @@ class Box {
     return this.state == "superselected";
   }
 
+  makeWall() {
+    if( ! this.isWall()) {
+      changedBoxes.push(this);
+    }
+    this.state = "wall";
+  }
+
+  makeEmpty() {
+    if( ! this.isEmpty()) {
+      changedBoxes.push(this);
+    }
+    this.state = "empty";
+  }
+
+  makeSelected() {
+    if( ! this.isSelected()) {
+      changedBoxes.push(this);
+    }
+    this.state = "selected";
+  }
+
+  makeEnd() {
+    if( ! this.isEnd()) {
+      changedBoxes.push(this);
+    }
+    this.state = "end";
+  }
+
+  makeStart() {
+    if( ! this.isStart()) {
+      changedBoxes.push(this);
+    }
+    this.state = "start";
+  }
+
+  makeSuperSelected() {
+    if( ! this.isSuperSelected()) {
+      changedBoxes.push(this);
+    }
+    this.state = "superselected";
+  }
+
+
+
   display() {
     switch (this.state) {
       case "empty":
@@ -98,7 +120,7 @@ class Box {
         fill(0, 0, 0);
         break;
       case "selected":
-        fill(200, 200, 0);
+        fill(66, 135, 245);
         break;
       case "end":
         fill(220, 0 ,0);
@@ -122,6 +144,12 @@ function drawBoxes() {
     for(let j = 0; j < boxCount.x; j++) {
       boxes[i][j].display();
     }
+  }
+}
+
+function drawChangedBoxes() {
+  for(let i = 0; i < changedBoxes.length; i++) {
+    changedBoxes[i].display();
   }
 }
 
@@ -177,9 +205,11 @@ function dfs() {
 }
 
 function draw() {
-  background(250);
+  //background(250);
   for(let i = 0; i < 2; i++) {
     dfs();
   }
-  drawBoxes();
+  // drawBoxes();
+  drawChangedBoxes();
+  changedBoxes = [];
 }
