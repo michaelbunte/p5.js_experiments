@@ -40,6 +40,14 @@ class Box {
     this.state = "selected";
   }
 
+  makeEnd() {
+    this.state = "end";
+  }
+
+  makeStart() {
+    this.state = "start";
+  }
+
   display() {
     switch (this.state) {
       case "empty":
@@ -49,6 +57,12 @@ class Box {
         fill(0, 0, 0);
         break;
       case "selected":
+        fill(200, 200, 0);
+        break;
+      case "end":
+        fill(255, 0 ,0);
+        break;
+      case "start":
         fill(0, 0, 255);
         break;
       default: 
