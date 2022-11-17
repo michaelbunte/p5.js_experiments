@@ -6,7 +6,7 @@ let endSquare;
 let mazeStack;
 
 function setup() {
-  boxCount = createVector(20, 10);
+  boxCount = createVector(50, 50);
   boxSize = 10;
   boxes = [];
   for (let i = 0; i < boxCount.y; i++) {
@@ -60,6 +60,11 @@ class Box {
     this.state = "start";
   }
 
+  makeSuperSelected() {
+    this.state = "superselected";
+  }
+
+
   isWall() {
     return this.state == "wall";
   }
@@ -80,6 +85,10 @@ class Box {
     return this.state == "start";
   }
 
+  isSuperSelected() {
+    return this.state == "superselected";
+  }
+
   display() {
     switch (this.state) {
       case "empty":
@@ -97,6 +106,9 @@ class Box {
       case "start":
         fill(0, 200, 0);
         break;
+      case "superselected":
+        fill(110, 43, 255);
+        break;
       default: 
         fill(255, 0, 0);
     }
@@ -110,6 +122,16 @@ function drawBoxes() {
     for(let j = 0; j < boxCount.x; j++) {
       boxes[i][j].display();
     }
+  }
+}
+
+  // function i copied from stack overflow
+function shuffleArray(array) {
+  for (var i = array.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = array[i];
+      array[i] = array[j];
+      array[j] = temp;
   }
 }
 
@@ -129,7 +151,14 @@ function getAdjacentBoxes(box) {
   if(xpos > 0) {
     adjacentBoxes.push(boxes[ypos][xpos - 1]);
   }  
+  shuffleArray(adjacentBoxes);
   return adjacentBoxes;
+}
+
+function superSelectPath() {
+  for(let i = 0; i < mazeStack.length; i++) {
+    mazeStack[i].makeSuperSelected();
+  }
 }
 
 function draw() {
@@ -141,9 +170,10 @@ function draw() {
       if(adjacentBoxes[i].isEmpty()) {
         adjacentBoxes[i].makeSelected();
         mazeStack.push(adjacentBoxes[i]);
+      } else if (adjacentBoxes[i].isEnd()) {
+        // superSelectPath();
       }
     }
   }
-
   drawBoxes();
 }
