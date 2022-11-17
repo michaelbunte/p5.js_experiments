@@ -15,7 +15,7 @@ function setup() {
       let newBox = new Box(j, i, boxSize);
       boxes[i].push(newBox);
 
-      if(random(0, 100) > 70) {
+      if(random(0, 100) > 65) {
         boxes[i][j].makeWall();
       }
     }
@@ -161,8 +161,7 @@ function superSelectPath() {
   }
 }
 
-function draw() {
-  background(250);
+function dfs() {
   if(mazeStack.length > 0) {
     let top = mazeStack.pop();
     let adjacentBoxes = getAdjacentBoxes(top);
@@ -174,6 +173,13 @@ function draw() {
         // superSelectPath();
       }
     }
+  }
+}
+
+function draw() {
+  background(250);
+  for(let i = 0; i < 2; i++) {
+    dfs();
   }
   drawBoxes();
 }
