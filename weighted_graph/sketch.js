@@ -9,10 +9,10 @@ function setup(){
 }
 
 function restart() {
-    canvasSize = createVector(400, 400);
+    canvasSize = createVector(800, 400);
     nodeCount = 10;
     nodes = [];
-    unitLength = 10;
+    unitLength = 30;
     
     for(let i = 0; i < nodeCount; i++) {
         let node = new Node(i);
@@ -43,7 +43,9 @@ class Node {
     
 
     moveToRandom() {
-        this.pos = createVector(random(canvasSize.x), random(canvasSize.y));
+        let halfX = canvasSize.x/2;
+        let halfY = canvasSize.y/2
+        this.pos = createVector(random(-halfX/2, halfX/2) + halfY, random(-halfY/2,halfY/2) + halfY);
     }
     
     pairWeights(friends, weights) {
@@ -64,16 +66,54 @@ class Node {
         }
     }
 
-    // move() {
-    //     let netX = 0;
-    //     let netY = 0;
-    //     for(let i = 0; i < pairs.length; i++) {
-    //         let dist = dist(this.pos.x, this.pos.y, this.pairs[i].pos.x, this.pairs[i].pos.y);
+    move() {
+        let netX = 0;
+        let netY = 0;
+        for(let i = 0; i < this.pairs.length; i++) {
+            let udist = dist(this.pos.x, this.pos.y, this.pairs[i][0].pos.x, this.pairs[i][0].pos.y);
+            angleMode(DEGREES);
+            // let angle = this.pos.angleBetween(this.pairs[i][0].pos);
+            let angleVec = this.pos.copy().sub(this.pairs[i][0].pos.x);
+            let compAngle = createVector(50, 0);
 
-    //     }
-    // }
+            let angle
+            if(this.pos.x -  this.pairs[i][0].pos.x != 0) {
+                angle = atan((this.pos.y - this.pairs[i][0].pos.y) / (this.pos.x -  this.pairs[i][0].pos.x));
+            } else {
+                angle = 0;
+            }
+            if(this.pos.x > this.pairs[i][0].pos.x) {
+                angle += 180;
+            }
+            console.log(angle);
+            let gap = udist - this.pairs[i][1] * unitLength;
+            let minigap = abs(gap) * 0.1
+            if(gap > 0) {
+                netX += cos(angle) * minigap;
+                netY += sin(angle) * minigap;
+            } else {
+                netX -= cos(angle) * minigap;
+                netY -= sin(angle) * minigap;
+            }
+            console.log(netX);
+            // console.log(angle);
+            // console.log(gap);
+            // if(gap > 0) {
+            //     netX += cos(angle) * abs(gap) * 0.01;
+            //     netY += sin(angle) * abs(gap) * 0.01;
+            // }
+        }
+        
+        this.pos.x += netX;
+        this.pos.y += netY;
+    }
 }
 
+function moveNodes() {
+    for(let i = 1; i < nodes.length; i++) {
+        nodes[i].move();
+    }
+}
 
 
 function drawNodes() {
@@ -89,6 +129,12 @@ function drawNodes() {
 }
 
 function draw() {
-  background(255);
-  drawNodes();
+    background(255);
+    moveNodes();
+    // nodes[1].pairs = [];
+    // nodes[1].addFriend(nodes[0], 3);
+    // nodes[0].move();
+    // nodes[1].move();
+    // nodes[2].move();
+    drawNodes();
 }
