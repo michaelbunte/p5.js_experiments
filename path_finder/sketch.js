@@ -22,7 +22,7 @@ function resetMaze() {
       let newBox = new Box(j, i, boxSize);
       boxes[i].push(newBox);
 
-      if(random(0, 100) > 60) {
+      if(random(0, 100) > 70) {
         boxes[i][j].makeWall();
       }
     }

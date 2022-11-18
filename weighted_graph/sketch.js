@@ -3,16 +3,20 @@ let nodes;
 let nodeCount;
 let canvasSize;
 let unitLength;
+let speedSlider;
+let sliderText;
+let nodeCountSlider;
+let maxNodes
 function setup(){
     restart();
     createCanvas(canvasSize.x, canvasSize.y);
 }
 
 function restart() {
-    canvasSize = createVector(800, 400);
-    nodeCount = 20;
+    canvasSize = createVector(600, 600);
+    nodeCount = 50;
     nodes = [];
-    unitLength = 30;
+    unitLength = 40;
     
     for(let i = 0; i < nodeCount; i++) {
         let node = new Node(i);
@@ -20,13 +24,21 @@ function restart() {
         nodes.push(node);
     }
 
-    let maxNodes = 2;
+    maxNodes = 2;
 
     for(let i = 0; i < nodeCount; i++) {
         for(let j = 0; j < maxNodes; j++) {
-            nodes[i].addFriend(nodes[floor(random()*nodes.length)], random(5));
+            nodes[i].addFriend(nodes[floor(random()*nodes.length)], random(1,4));
         }
     }
+
+    speedSlider = createSlider(0, 30, 1);
+    speedSlider.style('width', '80px');
+
+    sliderText = createElement("div", "speed");
+    sliderText.addClass('label');
+
+    nodeCountSlider = createSlider(2, 200, nodeCount);
 }
 
 class Node {
@@ -45,7 +57,7 @@ class Node {
     moveToRandom() {
         let halfX = canvasSize.x/2;
         let halfY = canvasSize.y/2
-        this.pos = createVector(random(-halfX/2, halfX/2) + halfY, random(-halfY/2,halfY/2) + halfY);
+        this.pos = createVector(random(-halfX, halfX) + halfY, random(-halfY,halfY) + halfY);
     }
     
     pairWeights(friends, weights) {
@@ -76,7 +88,7 @@ class Node {
             let angleVec = this.pos.copy().sub(this.pairs[i][0].pos.x);
             let compAngle = createVector(50, 0);
 
-            let angle
+            let angle;
             if(this.pos.x -  this.pairs[i][0].pos.x != 0) {
                 angle = atan((this.pos.y - this.pairs[i][0].pos.y) / (this.pos.x -  this.pairs[i][0].pos.x));
             } else {
@@ -94,14 +106,16 @@ class Node {
                 netX -= cos(angle) * minigap;
                 netY -= sin(angle) * minigap;
             }
-            // console.log(angle);
-            // console.log(gap);
-            // if(gap > 0) {
-            //     netX += cos(angle) * abs(gap) * 0.01;
-            //     netY += sin(angle) * abs(gap) * 0.01;
-            // }
         }
         
+        // let mouseDisp = createVector(mouseX - pmouseX, mouseY - pmouseY).div(2);
+        
+        // let distFromMouse = dist(mouseX, mouseY, this.pos.x, this.pos.y);
+        // if( distFromMouse != 0) {
+        //     netX += mouseDisp.x * sqrt(sqrt(1 / (distFromMouse)) * 5);
+        //     netY += mouseDisp.y * sqrt(sqrt(1 / (distFromMouse)) * 5);
+        // }
+
         this.pos.x += netX;
         this.pos.y += netY;
     }
@@ -115,13 +129,19 @@ function moveNodes() {
 
 
 function drawNodes() {
-    stroke(0);
     for(let i = 0; i < nodes.length; i++) {
+        stroke(200);
         strokeWeight(1);
         for(let j = 0; j < nodes[i].pairs.length; j++) {
             line(nodes[i].pos.x, nodes[i].pos.y, nodes[i].pairs[j][0].pos.x, nodes[i].pairs[j][0].pos.y);
         }
+    }
+    for(let i = 0; i < nodes.length; i++) {
         strokeWeight(10);
+        stroke(255);
+        point(nodes[i].pos.x, nodes[i].pos.y);
+        strokeWeight(8);
+        stroke(0);
         point(nodes[i].pos.x, nodes[i].pos.y);
     }
 }
@@ -135,7 +155,6 @@ function getAveragePos() {
 }
 
 function centerNodes() {
-    console.log(getCenter().x)
     let avgPos = getAveragePos().copy();
     let disp = avgPos.sub(getCenter());
     for(let i = 0; i < nodes.length; i++) {
@@ -147,14 +166,31 @@ function getCenter() {
     return canvasSize.copy().div(2);
 }
 
+function jitterNodes() {
+    for(let i = 0; i < nodes.length; i++) {
+        nodes[i].pos.add(random(-10, 10), random(-10, 10));
+    }
+}
+
 function draw() {
-    background(255);
-    moveNodes();
+    background(0);
+    for(let i = 0; i < speedSlider.value(); i++) {
+        moveNodes();
+
+    }
+
     centerNodes();
-    // nodes[1].pairs = [];
-    // nodes[1].addFriend(nodes[0], 3);
-    // nodes[0].move();
-    // nodes[1].move();
-    // nodes[2].move();
     drawNodes();
+
+    if(nodeCount < nodeCountSlider.value()) {
+        console.log("thing")
+        let node = new Node(nodes.length);
+        nodeCount++;
+        node.moveToRandom();
+        nodes.push(node);
+        for(let j = 0; j < maxNodes; j++) {
+            node.addFriend(nodes[floor(random()*nodes.length)], random(1,4));
+        }
+        jitterNodes();
+    }
 }
