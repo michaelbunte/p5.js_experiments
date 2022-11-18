@@ -10,7 +10,7 @@ function setup(){
 
 function restart() {
     canvasSize = createVector(800, 400);
-    nodeCount = 10;
+    nodeCount = 20;
     nodes = [];
     unitLength = 30;
     
@@ -85,7 +85,6 @@ class Node {
             if(this.pos.x > this.pairs[i][0].pos.x) {
                 angle += 180;
             }
-            console.log(angle);
             let gap = udist - this.pairs[i][1] * unitLength;
             let minigap = abs(gap) * 0.1
             if(gap > 0) {
@@ -95,7 +94,6 @@ class Node {
                 netX -= cos(angle) * minigap;
                 netY -= sin(angle) * minigap;
             }
-            console.log(netX);
             // console.log(angle);
             // console.log(gap);
             // if(gap > 0) {
@@ -110,7 +108,7 @@ class Node {
 }
 
 function moveNodes() {
-    for(let i = 1; i < nodes.length; i++) {
+    for(let i = 0; i < nodes.length; i++) {
         nodes[i].move();
     }
 }
@@ -128,9 +126,31 @@ function drawNodes() {
     }
 }
 
+function getAveragePos() {
+    let totPos = createVector(0, 0);
+    for(let i = 0; i < nodes.length; i++) {
+        totPos.add(nodes[i].pos);
+    }
+    return totPos.div(nodes.length);
+}
+
+function centerNodes() {
+    console.log(getCenter().x)
+    let avgPos = getAveragePos().copy();
+    let disp = avgPos.sub(getCenter());
+    for(let i = 0; i < nodes.length; i++) {
+        nodes[i].pos.sub(disp);
+    }
+}
+
+function getCenter() {
+    return canvasSize.copy().div(2);
+}
+
 function draw() {
     background(255);
     moveNodes();
+    centerNodes();
     // nodes[1].pairs = [];
     // nodes[1].addFriend(nodes[0], 3);
     // nodes[0].move();
