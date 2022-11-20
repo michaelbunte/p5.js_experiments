@@ -7,28 +7,45 @@ let input;
 let canvasDims;
 let currLetters;
 let acceptedChars;
+let wrapTextCheck;
+let wrapText;
+
+
+/* 
+
+input -> currLetters -> desiredLetters
+
+*/
 
 function setup() {
 
-    let chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_',.? ";
+    let chars = "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_',.?";
     acceptedChars = [];
     for(let i = 0; i < chars.length; i++) {
         acceptedChars.push(chars[i]);
     }
 
     dimensions = createVector(15, 8);
-    letterSize = createVector(16, 24);
+    letterSize = createVector(14, 18);
     mainMargin = 20;
     letterMargin = 2;
     desiredLetters = Array(dimensions.x * dimensions.y).fill(' ');
     currLetters = [...desiredLetters];
-    // currLetters = desiredLetters;
+    
     input = createElement("textarea");
     input.input(myInputEvent);
+
+    wrapTextCheck = createCheckbox("check me", false);
+    wrapTextCheck.changed(toggleWrapText);
+    wrapText = false;
+
     canvasDims = createVector(2 * mainMargin + letterSize.x * dimensions.x + letterMargin * (dimensions.x - 1), 
     2 * mainMargin + letterSize.y * dimensions.y + letterMargin * (dimensions.y - 1));    
     
     createCanvas(canvasDims.x, canvasDims.y);
+
+    background(60);
+    drawLetters();
 }
 
 function myInputEvent() {
@@ -42,12 +59,18 @@ function myInputEvent() {
     
 }
 
+function toggleWrapText() {
+    wrapText = !wrapText;
+}
+
 function updateLetters() {
     
+    let changed = false;
     for(let i = 0; i < currLetters.length; i++) {
         if(desiredLetters[i] == currLetters[i]) {
             continue;
-        }
+        } 
+        changed = true;
         let ind = acceptedChars.indexOf(currLetters[i]);
         ind++;
         if(ind >= acceptedChars.length) {
@@ -55,6 +78,7 @@ function updateLetters() {
         }
         currLetters[i] = acceptedChars[ind];
     }
+    return changed;
 }
 
 function drawLetters() {
@@ -80,13 +104,10 @@ function drawLetters() {
 }
 
 function draw() {
-    background(60);
-
     if(frameCount % 2 == 0) {
-        updateLetters();
+        if(updateLetters()) {
+            background(60);
+            drawLetters();
+        }
     }
-
-
-    drawLetters();
-    console.log(desiredLetters);
 }
