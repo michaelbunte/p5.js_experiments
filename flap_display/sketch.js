@@ -13,7 +13,7 @@ let wrapText;
 
 /* 
 
-input -> currLetters -> desiredLetters
+input -> desiredLetters -> currLetters
 
 */
 
@@ -57,6 +57,57 @@ function myInputEvent() {
         desiredLetters[i] = ' ';
     }
     
+    // newline handling
+    for(let g = 0; g < desiredLetters.length; g++) {
+        if(desiredLetters[g] == '\n') {
+            let spaces = dimensions.x - g % dimensions.x - 1;
+            if(spaces == dimensions.x - 1) {
+                desiredLetters.splice(g, 1);
+                desiredLetters.push(' ');
+                g--;
+            } else {
+                desiredLetters[g] = ' ';
+                for(let j = 0; j < spaces; j++) {
+                    desiredLetters.splice(g, 0, ' ');
+                    desiredLetters.pop();
+                }
+            }
+        }
+    }
+
+    //text centering
+    console.log("==============")
+    for(let g = 0; g < desiredLetters.length; g+=dimensions.x) { 
+        let leftSpaces = 0;
+        for( ; leftSpaces < dimensions.x; leftSpaces++) {
+            if(desiredLetters[leftSpaces + g] != ' ') {
+                break;
+            }
+        }
+        let rightSpaces = 0;
+        for( ; rightSpaces < dimensions.x; rightSpaces++) {
+            if(desiredLetters[g + dimensions.x - 1 - rightSpaces] != ' ') {
+                break;
+            }
+        }
+
+        let center = floor((rightSpaces + leftSpaces) / 2);
+
+        for(let z = 0; z < center - leftSpaces; z++) {
+            desiredLetters.splice(g, 0, ' ');
+            desiredLetters.splice(g + dimensions.x - 1, 1);
+        }
+
+        console.log(leftSpaces + "  " + rightSpaces);
+    }
+
+    // for(let g = 0; g < desiredLetters.length; g++) {
+    //     if(desiredLetters[g] == '\n') {
+    //         desiredLetters[g] == ' ';
+    //         console.log("replacing")
+    //     }
+    // }
+    // console.log(desiredLetters);
 }
 
 function toggleWrapText() {
@@ -64,7 +115,6 @@ function toggleWrapText() {
 }
 
 function updateLetters() {
-    
     let changed = false;
     for(let i = 0; i < currLetters.length; i++) {
         if(desiredLetters[i] == currLetters[i]) {
