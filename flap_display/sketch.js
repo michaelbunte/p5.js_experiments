@@ -9,6 +9,7 @@ let currLetters;
 let acceptedChars;
 let wrapTextCheck;
 let wrapText;
+let backgroundColor;
 
 
 /* 
@@ -30,8 +31,10 @@ function setup() {
         acceptedChars.push(chars[i]);
     }
 
+    backgroundColor = color(60, 60, 50);
+
     dimensions = createVector(15, 8);
-    letterSize = createVector(14, 18);
+    letterSize = createVector(14, 19);
     mainMargin = 20;
     letterMargin = 2;
     desiredLetters = Array(dimensions.x * dimensions.y).fill(' ');
@@ -49,7 +52,8 @@ function setup() {
     
     createCanvas(canvasDims.x, canvasDims.y);
     textFont(fontRegular);
-    background(60);
+    textSize(20);
+    background(backgroundColor);
     drawLetters();
 }
 
@@ -182,17 +186,26 @@ function updateLetters() {
 }
 
 function drawLetters() {
-    strokeWeight(0);
     let posX = mainMargin;
     let posY = mainMargin;
     let xLetters = 0; 
     textAlign(CENTER, CENTER);
     textStyle(BOLD);
+    strokeCap(SQUARE);
     for(let i = 0; i < desiredLetters.length; i++) {
+        strokeWeight(0);
         fill(0);
-        rect(posX, posY, letterSize.x, letterSize.y);
+        rect(posX, posY, letterSize.x, letterSize.y / 2 + 1);
+        fill(30);
+        rect(posX, posY + letterSize.y / 2 + 1, letterSize.x, letterSize.y / 2 - 1);
+
         fill(255);
-        text(currLetters[i], posX + letterSize.x/2, posY + letterSize.y/2);
+        text(currLetters[i], posX + letterSize.x/2, posY + letterSize.y/2 - 2);
+
+        stroke(0);
+        strokeWeight(1);
+        line(posX, posY + letterSize.y / 2 + 1, posX + letterSize.x, posY + letterSize.y / 2 + 1);
+
         posX += letterMargin + letterSize.x;
         xLetters++;
         if(xLetters >= dimensions.x) {
@@ -208,7 +221,7 @@ function draw() {
     // inputTime();
     if(frameCount % 2 == 0) {
         if(updateLetters()) {
-            background(60);
+            background(backgroundColor);
             drawLetters();
         }
     }
