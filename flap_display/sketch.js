@@ -17,6 +17,11 @@ input -> desiredLetters -> currLetters
 
 */
 
+let fontRegular;
+function preload() {
+    fontRegular = loadFont('monofonto_rg.otf')
+}
+
 function setup() {
 
     let chars = "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_',.?";
@@ -43,7 +48,7 @@ function setup() {
     2 * mainMargin + letterSize.y * dimensions.y + letterMargin * (dimensions.y - 1));    
     
     createCanvas(canvasDims.x, canvasDims.y);
-
+    textFont(fontRegular);
     background(60);
     drawLetters();
 }
