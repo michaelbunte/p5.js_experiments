@@ -24,7 +24,7 @@ function preload() {
 
 function setup() {
 
-    let chars = "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_',.?";
+    let chars = "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_',.?:";
     acceptedChars = [];
     for(let i = 0; i < chars.length; i++) {
         acceptedChars.push(chars[i]);
@@ -62,6 +62,23 @@ function myInputEvent() {
         desiredLetters[i] = ' ';
     }
     
+    reformatText();
+}
+
+function inputTime() {
+    let d = new Date();
+    let timeString = `the time is\n${d.getHours().toString()}:${d.getMinutes().toString()}:${d.getSeconds().toString()}`;
+    let i;
+    for(i = 0; i < timeString.length && i < desiredLetters.length; i++) {
+        desiredLetters[i] = timeString[i];
+    }
+    for( ; i < desiredLetters.length; i++) {
+        desiredLetters[i] = ' ';
+    }
+    reformatText();
+}
+
+function reformatText() {
     // newline handling
     for(let g = 0; g < desiredLetters.length; g++) {
         if(desiredLetters[g] == '\n') {
@@ -80,8 +97,7 @@ function myInputEvent() {
         }
     }
 
-    //text centering
-    console.log("==============")
+    //horizontal text centering
     for(let g = 0; g < desiredLetters.length; g+=dimensions.x) { 
         let leftSpaces = 0;
         for( ; leftSpaces < dimensions.x; leftSpaces++) {
@@ -102,17 +118,46 @@ function myInputEvent() {
             desiredLetters.splice(g, 0, ' ');
             desiredLetters.splice(g + dimensions.x - 1, 1);
         }
-
-        console.log(leftSpaces + "  " + rightSpaces);
     }
 
-    // for(let g = 0; g < desiredLetters.length; g++) {
-    //     if(desiredLetters[g] == '\n') {
-    //         desiredLetters[g] == ' ';
-    //         console.log("replacing")
-    //     }
-    // }
-    // console.log(desiredLetters);
+    //vertical text centering
+    let topSpaces = 0
+    let doBreak = false;
+    for(let g = 0; g < desiredLetters.length; g+=dimensions.x) { 
+        for(let h = 0; h < dimensions.x; h++) {
+            if(desiredLetters[g + h] != ' ') {
+                doBreak = true;
+                break;
+            }
+        }
+        if(doBreak) {
+            break;
+        }
+        topSpaces++;
+    }
+    let bottomSpaces = 0
+    doBreak = false;
+    for(let g = desiredLetters.length - dimensions.x; g >= 0; g-=dimensions.x) { 
+        for(let h = 0; h < dimensions.x; h++) {
+            if(desiredLetters[g + h] != ' ') {
+                doBreak = true;
+                break;
+            }
+        }
+        if(doBreak) {
+            break;
+        }
+        bottomSpaces++;
+    }
+
+    let center = floor((bottomSpaces + topSpaces) / 2);
+    console.log(center - topSpaces);
+    for(let z = 0; z < center - topSpaces; z++) {
+        for(let u = 0; u < dimensions.x; u++) {
+            desiredLetters.splice(0, 0, ' ');
+            desiredLetters.pop();
+        }
+    }
 }
 
 function toggleWrapText() {
@@ -159,10 +204,13 @@ function drawLetters() {
 }
 
 function draw() {
+
+    // inputTime();
     if(frameCount % 2 == 0) {
         if(updateLetters()) {
             background(60);
             drawLetters();
         }
     }
+
 }
